@@ -47,7 +47,7 @@ class Trainer(object):
         self.sample_path = config.sample_path
         self.log_epoch = config.log_epoch
         # self.sample_epoch = config.sample_epoch
-        self.model_save_epoch = config.model_save_epoch
+        # self.model_save_epoch = config.model_save_epoch
         self.version = config.version
 
         # Path

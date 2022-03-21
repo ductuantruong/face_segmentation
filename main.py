@@ -6,12 +6,13 @@ from torch.backends import cudnn
 from utils import make_folder
 from argparse import ArgumentParser
 
+def str2bool(v):
+    return v.lower() in ('true')
+
 def main(config):
     # For fast training
     cudnn.benchmark = True
-
     if config.train:
-
     # Create directories if not exist
         make_folder(config.model_save_path, config.version)
         # make_folder(config.sample_path, config.version)
@@ -30,7 +31,7 @@ def main(config):
 if __name__ == '__main__':
     #config = get_parameters()
     parser = ArgumentParser(add_help=True)
-    parser.add_argument('--train', type=bool, default=True)
+    parser.add_argument('--train', type=str2bool, default=True)
     parser.add_argument('--version', type=str, default='0')
     parser.add_argument('--sample_path', type=str, default=False)
     parser.add_argument('--log_path', type=str, default='logs')
@@ -38,13 +39,13 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--total_epoch', type=int, default=5)
     parser.add_argument('--num_workers', type=int, default=1)
-    parser.add_argument('--parallel', type=bool, default=False)
+    parser.add_argument('--parallel', type=str2bool, default=False)
     parser.add_argument('--g_lr', type=float, default=0.0002)
     parser.add_argument('--lr_decay', type=float, default=0.95)
     parser.add_argument('--beta1', type=float, default=0.5)
     parser.add_argument('--beta2', type=float, default=0.999)
     parser.add_argument('--pretrained_model', type=int, default=None)
-    parser.add_argument('--use_tensorboard', type=bool, default=True)
+    parser.add_argument('--use_tensorboard', type=str2bool, default=True)
     parser.add_argument('--model_save_path', type=str, default='./models')
     parser.add_argument('--model_name', type=str, default=None)
     parser.add_argument('--img_path', type=str, default='data/CelebAMaskHQ/train/train_image')
