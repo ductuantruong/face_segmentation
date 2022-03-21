@@ -1,10 +1,10 @@
-from parameter import *
+#from parameter import *
 from trainer import Trainer
 from tester import Tester
 from data_loader import Data_Loader
 from torch.backends import cudnn
 from utils import make_folder
-from  argparse import ArgumentParser
+from argparse import ArgumentParser
 
 
 def main(config):
@@ -27,7 +27,7 @@ def main(config):
         tester.test()
 
 if __name__ == '__main__':
-    config = get_parameters()
+    #config = get_parameters()
     parser = ArgumentParser(add_help=True)
     parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--version', type=str, default='0')
@@ -45,11 +45,11 @@ if __name__ == '__main__':
     parser.add_argument('--pretrained_model', type=int, default=None)
     parser.add_argument('--use_tensorboard', type=bool, default=True)
     parser.add_argument('--model_save_path', type=str, default='./models')
-    parser.add_argument('--img_path', type=str, default='data/train/train_image')
-    parser.add_argument('--label_path', type=str, default='data/train/train_mask') 
-    parser.add_argument('--val_image_path', type=str, default='data/val/val_image') 
-    parser.add_argument('--val_label_path', type=str, default='data/val/val_mask') 
-    parser.add_argument('--test_image_path', type=str, default='data/test/test_image') 
+    parser.add_argument('--img_path', type=str, default='data/CelebAMaskHQ/train/train_image')
+    parser.add_argument('--label_path', type=str, default='data/CelebAMaskHQ/train/train_mask') 
+    parser.add_argument('--val_image_path', type=str, default='data/CelebAMaskHQ/val/val_image') 
+    parser.add_argument('--val_label_path', type=str, default='data/CelebAMaskHQ/val/val_mask') 
+    parser.add_argument('--test_image_path', type=str, default='data/CelebAMaskHQ/test/test_image') 
     parser.add_argument('--test_label_path', type=str, default='./test_results') 
     
     parser.add_argument('--log_epoch', type=int, default=10)

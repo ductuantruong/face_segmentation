@@ -55,7 +55,7 @@ class Trainer(object):
 
         self.build_model()
 
-        if self.use_tensorboard:
+        if not self.use_tensorboard:
             self.build_tensorboard()
 
         # Start with trained model
