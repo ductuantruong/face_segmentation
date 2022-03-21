@@ -3,7 +3,7 @@ import os
 import time
 import torch
 import datetime
-import tqdm
+from tqdm import tqdm
 
 import torch.nn as nn
 from torch.autograd import Variable
@@ -17,10 +17,11 @@ from tensorboardX import SummaryWriter
 writer = SummaryWriter('runs/training')
 
 class Trainer(object):
-    def __init__(self, data_loader, config):
+    def __init__(self, train_loader, eval_loader, config):
 
         # Data loader
-        self.data_loader = data_loader
+        self.train_loader = train_loader
+        self.eval_loader = eval_loader
 
         # exact model and loss
         # self.model = config.model
@@ -66,8 +67,8 @@ class Trainer(object):
     def train(self):
 
         # Data iterator
-        # data_iter = iter(self.data_loader)
-        # step_per_epoch = len(self.data_loader)
+        # data_iter = iter(self.train_loader)
+        # step_per_epoch = len(self.train_loader)
         model_save_epoch = self.model_save_epoch
 
         # Start with trained model
@@ -78,15 +79,15 @@ class Trainer(object):
 
         # Start time
         # start_time = time.time()
+        min_epoch_loss = float('-inf')
         for epoch in range(start, self.total_epoch):
             self.G.train()
-            epoch_loss = []
-            with tqdm(self.data_loader, unit="batch") as tepoch:
+            with tqdm(self.train_loader, unit="batch") as tepoch:
                 for imgs, labels in tepoch:
                 # try:
                     # imgs, labels = next(data_iter)
                 # except:
-                    # data_iter = iter(self.data_loader)
+                    # data_iter = iter(self.train_loader)
                     # imgs, labels = next(data_iter)
                     tepoch.set_description(f"Epoch {epoch}")
                     size = labels.size()
@@ -104,10 +105,36 @@ class Trainer(object):
                     # Calculate cross entropy loss
                     c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
                     tepoch.set_postfix(loss=c_loss.data)
-                    epoch_loss.append(c_loss.data)
                     self.reset_grad()
                     c_loss.backward()
                     self.g_optimizer.step()
+            
+            self.G.eval()
+            epoch_loss = []
+            with tqdm(self.eval_loader, unit="batch") as eepoch:
+                for imgs, labels in eepoch:
+                # try:
+                    # imgs, labels = next(data_iter)
+                # except:
+                    # data_iter = iter(self.train_loader)
+                    # imgs, labels = next(data_iter)
+                    eepoch.set_description(f"Evaluating Epoch {epoch}")
+                    size = labels.size()
+                    labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
+                    labels_real_plain = labels[:, 0, :, :].cuda()
+                    labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
+                    oneHot_size = (size[0], 19, size[2], size[3])
+                    labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
+                    labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
+
+                    imgs = imgs.cuda()
+                    # ================== Evaluate G =================== #
+                    labels_predict = self.G(imgs)
+                            
+                    # Calculate cross entropy loss
+                    c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
+                    eepoch.set_postfix(loss=c_loss.data)
+                    epoch_loss.append(c_loss.data.item())
             avg_epoch_loss = round(sum(epoch_loss) / len(epoch_loss), 4)
             # Print out log info
             # if (epoch + 1) % self.log_epoch == 0:
@@ -141,8 +168,9 @@ class Trainer(object):
                 # labels_sample = torch.from_numpy(labels_sample)
                 # save_image(denorm(labels_sample.data),
                         #    os.path.join(self.sample_path, '{}_predict.png'.format(epoch + 1)))
-
-            if (epoch+1) % model_save_epoch==0:
+            if avg_epoch_loss < min_epoch_loss:
+                min_epoch_loss = avg_epoch_loss
+                print('Saving new best model...')
                 torch.save(self.G.state_dict(),
                            os.path.join(self.model_save_path, '{}_G.pth'.format(epoch + 1)))
     
