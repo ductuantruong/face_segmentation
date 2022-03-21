@@ -5,7 +5,6 @@ from data_loader import Data_Loader
 from torch.backends import cudnn
 from utils import make_folder
 from argparse import ArgumentParser
-import tqdm
 
 def main(config):
     # For fast training
@@ -18,9 +17,11 @@ def main(config):
         # make_folder(config.sample_path, config.version)
         make_folder(config.log_path, config.version)
 
-        data_loader = Data_Loader(config.img_path, config.label_path, config.imsize,
+        train_loader = Data_Loader(config.img_path, config.label_path, config.imsize,
                              config.batch_size, config.train)
-        trainer = Trainer(data_loader.loader(), config)
+        eval_loader = Data_Loader(config.val_img_path, config.val_label_path, config.imsize,
+                             config.batch_size, False)
+        trainer = Trainer(train_loader.loader(), eval_loader.loader(), config)
         trainer.train()
     else:
         tester = Tester(config)
