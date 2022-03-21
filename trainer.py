@@ -69,7 +69,6 @@ class Trainer(object):
         # Data iterator
         # data_iter = iter(self.train_loader)
         # step_per_epoch = len(self.train_loader)
-        model_save_epoch = self.model_save_epoch
 
         # Start with trained model
         if self.pretrained_model:
@@ -170,7 +169,7 @@ class Trainer(object):
                         #    os.path.join(self.sample_path, '{}_predict.png'.format(epoch + 1)))
             if avg_epoch_loss < min_epoch_loss:
                 min_epoch_loss = avg_epoch_loss
-                print('Saving new best model...')
+                print('Saving new best model... Loss: {}'.format(min_epoch_loss))
                 torch.save(self.G.state_dict(),
                            os.path.join(self.model_save_path, '{}_G.pth'.format(epoch + 1)))
     

@@ -37,10 +37,10 @@ if __name__ == '__main__':
     parser.add_argument('--log_path', type=str, default='logs')
     parser.add_argument('--imsize', type=int, default=512)
     parser.add_argument('--batch_size', type=int, default=4)
-    parser.add_argument('--total_epoch', type=int, default=5)
+    parser.add_argument('--total_epoch', type=int, default=20)
     parser.add_argument('--num_workers', type=int, default=1)
     parser.add_argument('--parallel', type=str2bool, default=False)
-    parser.add_argument('--g_lr', type=float, default=0.0002)
+    parser.add_argument('--g_lr', type=float, default=0.0001)
     parser.add_argument('--lr_decay', type=float, default=0.95)
     parser.add_argument('--beta1', type=float, default=0.5)
     parser.add_argument('--beta2', type=float, default=0.999)
@@ -54,6 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('--val_label_path', type=str, default='data/CelebAMaskHQ/val/val_mask') 
     parser.add_argument('--test_img_path', type=str, default='data/CelebAMaskHQ/test/test_image') 
     parser.add_argument('--test_result_path', type=str, default='./test_results') 
+    parser.add_argument('--test_result_path_w_color', type=str, default='./test_results_w_color') 
     
     parser.add_argument('--log_epoch', type=int, default=10)
 

@@ -67,6 +67,7 @@ class Tester(object):
         self.log_path = os.path.join(config.log_path, self.version)
         self.model_save_path = os.path.join(config.model_save_path, self.version)
         self.test_result_path = config.test_result_path
+        self.test_result_path_w_color = config.test_result_path_w_color
         self.test_img_path = config.test_img_path
 
         # Test size and model
@@ -92,11 +93,11 @@ class Tester(object):
             imgs = torch.stack(imgs) 
             imgs = imgs.cuda()
             labels_predict = self.G(imgs)
-            # labels_predict_plain = generate_label_plain(labels_predict)
+            labels_predict_plain = generate_label_plain(labels_predict, self.imsize)
             labels_predict_color = generate_label(labels_predict, self.imsize)
             for k in range(self.batch_size):
-                # cv2.imwrite(os.path.join(self.test_label_path, str(i * self.batch_size + k) +'.png'), labels_predict_plain[k])
-                save_image(labels_predict_color[k], os.path.join(self.test_result_path, file_name))
+                cv2.imwrite(os.path.join(self.test_result_path, str(i * self.batch_size + k) +'.png'), labels_predict_plain[k])
+                save_image(labels_predict_color[k], os.path.join(self.test_result_path_w_color, test_files[i * self.batch_size + k]))
 
     def build_model(self):
         self.G = unet().cuda()
