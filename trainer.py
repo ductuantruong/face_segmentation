@@ -79,7 +79,7 @@ class Trainer(object):
 
         # Start time
         # start_time = time.time()
-        min_epoch_loss = float('-inf')
+        min_epoch_loss = float('inf')
         for epoch in range(start, self.total_epoch):
             self.G.train()
             with tqdm(self.train_loader, unit="batch") as tepoch:
