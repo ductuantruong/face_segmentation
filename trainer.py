@@ -3,6 +3,7 @@ import os
 import time
 import torch
 import datetime
+import tqdm
 
 import torch.nn as nn
 from torch.autograd import Variable
@@ -76,49 +77,50 @@ class Trainer(object):
             start = 0
 
         # Start time
-        start_time = time.time()
+        # start_time = time.time()
         for epoch in range(start, self.total_epoch):
             self.G.train()
             epoch_loss = []
-            for step, (imgs, labels) in enumerate(self.data_loader):
-                
-            # try:
-                # imgs, labels = next(data_iter)
-            # except:
-                # data_iter = iter(self.data_loader)
-                # imgs, labels = next(data_iter)
+            with tqdm(self.data_loader, unit="batch") as tepoch:
+                for imgs, labels in tepoch:
+                # try:
+                    # imgs, labels = next(data_iter)
+                # except:
+                    # data_iter = iter(self.data_loader)
+                    # imgs, labels = next(data_iter)
+                    tepoch.set_description(f"Epoch {epoch}")
+                    size = labels.size()
+                    labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
+                    labels_real_plain = labels[:, 0, :, :].cuda()
+                    labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
+                    oneHot_size = (size[0], 19, size[2], size[3])
+                    labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
+                    labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
 
-                size = labels.size()
-                labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
-                labels_real_plain = labels[:, 0, :, :].cuda()
-                labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
-                oneHot_size = (size[0], 19, size[2], size[3])
-                labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-                labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
-
-                imgs = imgs.cuda()
-                # ================== Train G =================== #
-                labels_predict = self.G(imgs)
-                        
-                # Calculate cross entropy loss
-                c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
-                epoch_loss.append(c_loss.data)
-                self.reset_grad()
-                c_loss.backward()
-                self.g_optimizer.step()
-            epoch_loss = round(sum(epoch_loss) / len(epoch_loss), 4)
+                    imgs = imgs.cuda()
+                    # ================== Train G =================== #
+                    labels_predict = self.G(imgs)
+                            
+                    # Calculate cross entropy loss
+                    c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
+                    tepoch.set_postfix(loss=c_loss.data)
+                    epoch_loss.append(c_loss.data)
+                    self.reset_grad()
+                    c_loss.backward()
+                    self.g_optimizer.step()
+            avg_epoch_loss = round(sum(epoch_loss) / len(epoch_loss), 4)
             # Print out log info
-            if (epoch + 1) % self.log_epoch == 0:
-                elapsed = time.time() - start_time
-                elapsed = str(datetime.timedelta(seconds=elapsed))
-                print("Elapsed [{}], G_epoch [{}/{}], Cross_entrophy_loss: {:.4f}".
-                      format(elapsed, epoch + 1, self.total_epoch, epoch_loss))
+            # if (epoch + 1) % self.log_epoch == 0:
+                # elapsed = time.time() - start_time
+                # elapsed = str(datetime.timedelta(seconds=elapsed))
+                # print("Elapsed [{}], G_epoch [{}/{}], Cross_entrophy_loss: {:.4f}".
+                    #   format(elapsed, epoch + 1, self.total_epoch, epoch_loss))
 
             # label_batch_predict = generate_label(labels_predict, self.imsize)
             # label_batch_real = generate_label(labels_real, self.imsize)
 
             # scalr info on tensorboardX
-            writer.add_scalar('Loss/Cross_entrophy_loss', epoch_loss, epoch) 
+            writer.add_scalar('Loss/Cross_entrophy_loss', avg_epoch_loss, epoch) 
 
             # image infor on tensorboardX
             # img_combine = imgs[0]
