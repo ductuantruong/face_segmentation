@@ -46,16 +46,15 @@ if __name__ == '__main__':
     parser.add_argument('--pretrained_model', type=int, default=None)
     parser.add_argument('--use_tensorboard', type=bool, default=True)
     parser.add_argument('--model_save_path', type=str, default='./models')
+    parser.add_argument('--model_name', type=str, default=None)
     parser.add_argument('--img_path', type=str, default='data/CelebAMaskHQ/train/train_image')
     parser.add_argument('--label_path', type=str, default='data/CelebAMaskHQ/train/train_mask') 
     parser.add_argument('--val_img_path', type=str, default='data/CelebAMaskHQ/val/val_image') 
     parser.add_argument('--val_label_path', type=str, default='data/CelebAMaskHQ/val/val_mask') 
     parser.add_argument('--test_img_path', type=str, default='data/CelebAMaskHQ/test/test_image') 
-    parser.add_argument('--test_label_path', type=str, default='./test_results') 
+    parser.add_argument('--test_result_path', type=str, default='./test_results') 
     
     parser.add_argument('--log_epoch', type=int, default=10)
-    # parser.add_argument('--sample_step', type=int, default=100)
-    parser.add_argument('--model_save_epoch', type=float, default=1.0)
 
     config = parser.parse_args()
 
