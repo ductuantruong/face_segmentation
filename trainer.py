@@ -12,6 +12,7 @@ import numpy as np
 import torch.nn.functional as F
 
 from unet import unet
+from deeplab.deeplabv3 import DeepLabV3
 from utils import *
 from tensorboardX import SummaryWriter
 
@@ -177,7 +178,8 @@ class Trainer(object):
     
     def build_model(self):
 
-        self.G = unet().to(device)
+        # self.G = unet().to(device)
+        self.G = DeepLabV3().to(device)
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
