@@ -14,6 +14,8 @@ import torch.nn.functional as F
 from unet import unet
 from utils import *
 from tensorboardX import SummaryWriter
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 writer = SummaryWriter('runs/training')
 
 class Trainer(object):
@@ -91,13 +93,13 @@ class Trainer(object):
                     tepoch.set_description(f"Epoch {epoch}")
                     size = labels.size()
                     labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
-                    labels_real_plain = labels[:, 0, :, :].cuda()
+                    labels_real_plain = labels[:, 0, :, :].to(device)
                     # labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
                     # oneHot_size = (size[0], 19, size[2], size[3])
                     # labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-                    # labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
+                    # labels_real = labels_real.scatter_(1, labels.data.long().to(device), 1.0)
 
-                    imgs = imgs.cuda()
+                    imgs = imgs.to(device)
                     # ================== Train G =================== #
                     labels_predict = self.G(imgs)
                             
@@ -120,13 +122,13 @@ class Trainer(object):
                     eepoch.set_description(f"Evaluating Epoch {epoch}")
                     size = labels.size()
                     labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
-                    labels_real_plain = labels[:, 0, :, :].cuda()
+                    labels_real_plain = labels[:, 0, :, :].to(device)
                     # labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
                     # oneHot_size = (size[0], 19, size[2], size[3])
                     # labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-                    # labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
+                    # labels_real = labels_real.scatter_(1, labels.data.long().to(device), 1.0)
 
-                    imgs = imgs.cuda()
+                    imgs = imgs.to(device)
                     # ================== Evaluate G =================== #
                     labels_predict = self.G(imgs)
                             
@@ -175,7 +177,7 @@ class Trainer(object):
     
     def build_model(self):
 
-        self.G = unet().cuda()
+        self.G = unet().to(device)
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 

@@ -4,13 +4,13 @@ import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def make_folder(path, version):
         if not os.path.exists(os.path.join(path, version)):
             os.makedirs(os.path.join(path, version))
 
 def tensor2var(x, grad=False):
-    if torch.cuda.is_available():
-        x = x.cuda()
+    x = x.to(device)
     return Variable(x, requires_grad=grad)
 
 def var2tensor(x):
