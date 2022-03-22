@@ -76,7 +76,7 @@ class Tester(object):
         self.build_model()
 
     def test(self):
-        transform = transformer(True, True, True, False, self.imsize) 
+        transform = transformer(False, True, True, False, self.imsize) 
         test_files = make_dataset(self.test_img_path)
         make_folder(self.test_result_path, '') 
         self.G.load_state_dict(torch.load(os.path.join(self.model_save_path, self.model_name)))

@@ -92,10 +92,10 @@ class Trainer(object):
                     size = labels.size()
                     labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
                     labels_real_plain = labels[:, 0, :, :].cuda()
-                    labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
-                    oneHot_size = (size[0], 19, size[2], size[3])
-                    labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-                    labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
+                    # labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
+                    # oneHot_size = (size[0], 19, size[2], size[3])
+                    # labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
+                    # labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
 
                     imgs = imgs.cuda()
                     # ================== Train G =================== #
@@ -121,10 +121,10 @@ class Trainer(object):
                     size = labels.size()
                     labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
                     labels_real_plain = labels[:, 0, :, :].cuda()
-                    labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
-                    oneHot_size = (size[0], 19, size[2], size[3])
-                    labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-                    labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
+                    # labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
+                    # oneHot_size = (size[0], 19, size[2], size[3])
+                    # labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
+                    # labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
 
                     imgs = imgs.cuda()
                     # ================== Evaluate G =================== #

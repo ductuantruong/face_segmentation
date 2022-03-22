@@ -21,7 +21,7 @@ def main(config):
         train_loader = Data_Loader(config.img_path, config.label_path, config.imsize,
                              config.batch_size, config.train)
         eval_loader = Data_Loader(config.val_img_path, config.val_label_path, config.imsize,
-                             config.batch_size, False)
+                             1, False)
         trainer = Trainer(train_loader.loader(), eval_loader.loader(), config)
         trainer.train()
     else:
@@ -36,13 +36,13 @@ if __name__ == '__main__':
     parser.add_argument('--sample_path', type=str, default=False)
     parser.add_argument('--log_path', type=str, default='logs')
     parser.add_argument('--imsize', type=int, default=512)
-    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--total_epoch', type=int, default=20)
     parser.add_argument('--num_workers', type=int, default=1)
     parser.add_argument('--parallel', type=str2bool, default=False)
     parser.add_argument('--g_lr', type=float, default=0.0001)
-    parser.add_argument('--lr_decay', type=float, default=0.95)
-    parser.add_argument('--beta1', type=float, default=0.5)
+    parser.add_argument('--lr_decay', type=float, default=0.99)
+    parser.add_argument('--beta1', type=float, default=0.9)
     parser.add_argument('--beta2', type=float, default=0.999)
     parser.add_argument('--pretrained_model', type=int, default=None)
     parser.add_argument('--use_tensorboard', type=str2bool, default=True)
