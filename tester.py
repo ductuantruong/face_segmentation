@@ -53,7 +53,6 @@ class Tester(object):
         self.imsize = config.imsize
         self.parallel = config.parallel
 
-        self.total_step = config.total_step
         self.batch_size = config.batch_size
         self.num_workers = config.num_workers
         self.g_lr = config.g_lr

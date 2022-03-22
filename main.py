@@ -19,8 +19,10 @@ def main(config):
         make_folder(config.log_path, config.version)
 
         data_loader = Data_Loader(config.img_path, config.label_path, config.imsize,
-                             config.batch_size, config.train)
-        trainer = Trainer(data_loader.loader(), config)
+                                  config.batch_size, config.train)
+        eval_loader = Data_Loader(config.val_img_path, config.val_label_path, config.imsize, 
+                                  config.batch_size, False)
+        trainer = Trainer(data_loader.loader(), eval_loader.loader(), config)
         trainer.train()
     else:
         tester = Tester(config)
@@ -28,6 +30,5 @@ def main(config):
 
 if __name__ == '__main__':
     config = get_parameters()
-
     # print(config)
     main(config)
