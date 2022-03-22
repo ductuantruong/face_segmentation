@@ -11,6 +11,7 @@ import numpy as np
 import torch.nn.functional as F
 
 from unet import unet
+from deeplab.deeplabv3 import DeepLabV3
 from utils import *
 from tensorboardX import SummaryWriter
 writer = SummaryWriter('runs/training')
@@ -140,7 +141,7 @@ class Trainer(object):
     
     def build_model(self):
 
-        self.G = unet().cuda()
+        self.G = DeepLabV3().cuda() # unet().cuda()
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 

@@ -13,6 +13,7 @@ from torchvision import transforms
 import cv2
 import PIL
 from unet import unet
+from deeplab.deeplabv3 import DeepLabV3
 from utils import *
 from PIL import Image
 
@@ -111,7 +112,7 @@ class Tester(object):
                 save_image(labels_predict_color[k], os.path.join(self.test_color_label_path, str(i * self.batch_size + k) +'.png'))
 
     def build_model(self):
-        self.G = unet().cuda()
+        self.G = DeepLabV3().cuda() # unet().cuda()
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
