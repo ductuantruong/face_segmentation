@@ -22,13 +22,13 @@ class Trainer(object):
         self.data_loader = data_loader
 
         # exact model and loss
-        # self.model = config.model
+        self.model = config.model
 
         # Model hyper-parameters
         self.imsize = config.imsize
         self.parallel = config.parallel
 
-        self.total_epoch = config.total_epoch
+        self.total_step = config.total_step
         self.batch_size = config.batch_size
         self.num_workers = config.num_workers
         self.g_lr = config.g_lr
@@ -43,19 +43,19 @@ class Trainer(object):
         self.log_path = config.log_path
         self.model_save_path = config.model_save_path
         self.sample_path = config.sample_path
-        self.log_epoch = config.log_epoch
-        # self.sample_epoch = config.sample_epoch
-        self.model_save_epoch = config.model_save_epoch
+        self.log_step = config.log_step
+        self.sample_step = config.sample_step
+        self.model_save_step = config.model_save_step
         self.version = config.version
 
         # Path
         self.log_path = os.path.join(config.log_path, self.version)
-        # self.sample_path = os.path.join(config.sample_path, self.version)
+        self.sample_path = os.path.join(config.sample_path, self.version)
         self.model_save_path = os.path.join(config.model_save_path, self.version)
 
         self.build_model()
 
-        if self.use_tensorboard:
+        if not self.use_tensorboard:
             self.build_tensorboard()
 
         # Start with trained model
@@ -65,9 +65,9 @@ class Trainer(object):
     def train(self):
 
         # Data iterator
-        # data_iter = iter(self.data_loader)
-        # step_per_epoch = len(self.data_loader)
-        model_save_epoch = self.model_save_epoch
+        data_iter = iter(self.data_loader)
+        step_per_epoch = len(self.data_loader)
+        model_save_step = int(self.model_save_step * step_per_epoch)
 
         # Start with trained model
         if self.pretrained_model:
@@ -77,48 +77,42 @@ class Trainer(object):
 
         # Start time
         start_time = time.time()
-        for epoch in range(start, self.total_epoch):
+        for step in range(start, self.total_step):
+
             self.G.train()
-            epoch_loss = []
-            for step, (imgs, labels) in enumerate(self.data_loader):
-                
-            # try:
-                # imgs, labels = next(data_iter)
-            # except:
-                # data_iter = iter(self.data_loader)
-                # imgs, labels = next(data_iter)
+            try:
+                imgs, labels = next(data_iter)
+            except:
+                data_iter = iter(self.data_loader)
+                imgs, labels = next(data_iter)
 
-                size = labels.size()
-                labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
-                labels_real_plain = labels[:, 0, :, :].cuda()
-                labels = labels[:, 0, :, :].view(size[0], 1, size[2], size[3])
-                oneHot_size = (size[0], 19, size[2], size[3])
-                labels_real = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-                labels_real = labels_real.scatter_(1, labels.data.long().cuda(), 1.0)
+            size = labels.size()
+            labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
+            labels_real_plain = labels[:, 0, :, :].cuda()
 
-                imgs = imgs.cuda()
-                # ================== Train G =================== #
-                labels_predict = self.G(imgs)
-                        
-                # Calculate cross entropy loss
-                c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
-                epoch_loss.append(c_loss.data)
-                self.reset_grad()
-                c_loss.backward()
-                self.g_optimizer.step()
-            epoch_loss = round(sum(epoch_loss) / len(epoch_loss), 4)
+
+            imgs = imgs.cuda()
+            # ================== Train G =================== #
+            labels_predict = self.G(imgs)
+                       
+            # Calculate cross entropy loss
+            c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
+            self.reset_grad()
+            c_loss.backward()
+            self.g_optimizer.step()
+
             # Print out log info
-            if (epoch + 1) % self.log_epoch == 0:
+            if (step + 1) % self.log_step == 0:
                 elapsed = time.time() - start_time
                 elapsed = str(datetime.timedelta(seconds=elapsed))
-                print("Elapsed [{}], G_epoch [{}/{}], Cross_entrophy_loss: {:.4f}".
-                      format(elapsed, epoch + 1, self.total_epoch, epoch_loss))
+                print("Elapsed [{}], G_step [{}/{}], Cross_entrophy_loss: {:.4f}".
+                      format(elapsed, step + 1, self.total_step, c_loss.data))
 
             # label_batch_predict = generate_label(labels_predict, self.imsize)
             # label_batch_real = generate_label(labels_real, self.imsize)
 
             # scalr info on tensorboardX
-            writer.add_scalar('Loss/Cross_entrophy_loss', epoch_loss, epoch) 
+            writer.add_scalar('Loss/Cross_entrophy_loss', c_loss.data, step) 
 
             # image infor on tensorboardX
             # img_combine = imgs[0]
@@ -128,21 +122,21 @@ class Trainer(object):
                 # img_combine = torch.cat([img_combine, imgs[i]], 2)
                 # real_combine = torch.cat([real_combine, label_batch_real[i]], 2)
                 # predict_combine = torch.cat([predict_combine, label_batch_predict[i]], 2)
-            # writer.add_image('imresult/img', (img_combine.data + 1) / 2.0, epoch)
-            # writer.add_image('imresult/real', real_combine, epoch)
-            # writer.add_image('imresult/predict', predict_combine, epoch)
+            # writer.add_image('imresult/img', (img_combine.data + 1) / 2.0, step)
+            # writer.add_image('imresult/real', real_combine, step)
+            # writer.add_image('imresult/predict', predict_combine, step)
 
             # Sample images
-            # if (epoch + 1) % self.sample_epoch == 0:
+            # if (step + 1) % self.sample_step == 0:
                 # labels_sample = self.G(imgs)
                 # labels_sample = generate_label(labels_sample)
                 # labels_sample = torch.from_numpy(labels_sample)
                 # save_image(denorm(labels_sample.data),
-                        #    os.path.join(self.sample_path, '{}_predict.png'.format(epoch + 1)))
+                        #    os.path.join(self.sample_path, '{}_predict.png'.format(step + 1)))
 
-            if (epoch+1) % model_save_epoch==0:
+            if (step+1) % model_save_step==0:
                 torch.save(self.G.state_dict(),
-                           os.path.join(self.model_save_path, '{}_G.pth'.format(epoch + 1)))
+                           os.path.join(self.model_save_path, '{}_G.pth'.format(step + 1)))
     
     def build_model(self):
 
@@ -163,8 +157,8 @@ class Trainer(object):
 
     def load_pretrained_model(self):
         self.G.load_state_dict(torch.load(os.path.join(
-            self.model_save_path, 'epoch_{}_G.pth'.format(self.pretrained_model))))
-        print('loaded trained models (epoch: {})..!'.format(self.pretrained_model))
+            self.model_save_path, '{}_G.pth'.format(self.pretrained_model))))
+        print('loaded trained models (step: {})..!'.format(self.pretrained_model))
 
     def reset_grad(self):
         self.g_optimizer.zero_grad()
