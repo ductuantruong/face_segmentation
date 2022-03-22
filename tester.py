@@ -14,6 +14,7 @@ from torchvision import transforms
 import cv2
 import PIL
 from unet import unet
+from deeplab.deeplabv3 import DeepLabV3
 from utils import *
 from PIL import Image
 
@@ -102,7 +103,8 @@ class Tester(object):
                 save_image(labels_predict_color[k], os.path.join(self.test_result_path_w_color, test_files[i * self.batch_size + k]))
 
     def build_model(self):
-        self.G = unet().to(device)
+        # self.G = unet().to(device)
+        self.G = DeepLabV3().to(device)
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
