@@ -32,7 +32,7 @@ class Trainer(object):
         self.imsize = config.imsize
         self.parallel = config.parallel
 
-        self.total_step = config.total_step
+        self.total_epoch = config.total_epoch
         self.batch_size = config.batch_size
         self.num_workers = config.num_workers
         self.g_lr = config.g_lr
@@ -82,7 +82,6 @@ class Trainer(object):
             with tqdm(self.train_loader, unit="batch") as tepoch:
                 for imgs, labels in tepoch:
                     tepoch.set_description(f"Epoch {epoch}")
-                    size = labels.size()
                     labels[:, 0, :, :] = labels[:, 0, :, :] * 255.0
                     labels_real_plain = labels[:, 0, :, :].to(device)
                     imgs = imgs.to(device)
