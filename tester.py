@@ -75,9 +75,9 @@ class Tester(object):
         self.log_path = os.path.join(config.log_path, self.version)
         self.sample_path = os.path.join(config.sample_path, self.version)
         self.model_save_path = os.path.join(config.model_save_path, self.version)
-        self.test_label_path = config.test_label_path
+        self.test_result_path = config.test_result_path
         self.test_color_label_path = config.test_color_label_path
-        self.test_image_path = config.test_image_path
+        self.test_img_path = config.test_img_path
 
         # Test size and model
         self.test_size = config.test_size
@@ -87,8 +87,8 @@ class Tester(object):
 
     def test(self):
         transform = transformer(True, True, True, False, self.imsize) 
-        test_paths = make_dataset(self.test_image_path)
-        make_folder(self.test_label_path, '')
+        test_paths = make_dataset(self.test_img_path)
+        make_folder(self.test_result_path, '')
         make_folder(self.test_color_label_path, '') 
         self.G.load_state_dict(torch.load(os.path.join(self.model_save_path, self.model_name)))
         self.G.eval() 
@@ -104,10 +104,10 @@ class Tester(object):
             imgs = torch.stack(imgs) 
             imgs = imgs.cuda()
             labels_predict = self.G(imgs)
-            labels_predict_plain = generate_label_plain(labels_predict)
-            labels_predict_color = generate_label(labels_predict)
+            labels_predict_plain = generate_label_plain(labels_predict, self.imsize)
+            labels_predict_color = generate_label(labels_predict, self.imsize)
             for k in range(self.batch_size):
-                cv2.imwrite(os.path.join(self.test_label_path, str(i * self.batch_size + k) +'.png'), labels_predict_plain[k])
+                cv2.imwrite(os.path.join(self.test_result_path, str(i * self.batch_size + k) +'.png'), labels_predict_plain[k])
                 save_image(labels_predict_color[k], os.path.join(self.test_color_label_path, str(i * self.batch_size + k) +'.png'))
 
     def build_model(self):

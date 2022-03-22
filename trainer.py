@@ -152,8 +152,8 @@ class Trainer(object):
         print(self.G)
 
     def build_tensorboard(self):
-        from logger import Logger
-        self.logger = Logger(self.log_path)
+        pass #from logger import Logger
+        #self.logger = Logger(self.log_path)
 
     def load_pretrained_model(self):
         self.G.load_state_dict(torch.load(os.path.join(

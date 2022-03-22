@@ -22,7 +22,7 @@ def get_parameters():
     parser.add_argument('--beta2', type=float, default=0.999)
 
     # Testing setting
-    parser.add_argument('--test_size', type=int, default=2824) 
+    parser.add_argument('--test_size', type=int, default=1000) 
     parser.add_argument('--model_name', type=str, default='model.pth') 
 
     # using pretrained
@@ -31,7 +31,7 @@ def get_parameters():
     # Misc
     parser.add_argument('--train', type=str2bool, default=True)
     parser.add_argument('--parallel', type=str2bool, default=False)
-    parser.add_argument('--use_tensorboard', type=str2bool, default=False)
+    parser.add_argument('--use_tensorboard', type=str2bool, default=True)
 
     # Path
     parser.add_argument('--img_path', type=str, default='data/CelebAMaskHQ/train/train_image')
