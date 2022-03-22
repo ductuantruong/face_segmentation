@@ -36,6 +36,8 @@ def get_parameters():
     # Path
     parser.add_argument('--img_path', type=str, default='data/CelebAMaskHQ/train/train_image')
     parser.add_argument('--label_path', type=str, default='data/CelebAMaskHQ/train/train_mask') 
+    parser.add_argument('--val_img_path', type=str, default='data/CelebAMaskHQ/val/val_image')
+    parser.add_argument('--val_label_path', type=str, default='data/CelebAMaskHQ/val/val_mask') 
     parser.add_argument('--log_path', type=str, default='./logs')
     parser.add_argument('--model_save_path', type=str, default='./models')
     parser.add_argument('--sample_path', type=str, default='./samples')
