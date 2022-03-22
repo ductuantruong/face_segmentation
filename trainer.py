@@ -196,7 +196,7 @@ class Trainer(object):
 
     def load_pretrained_model(self):
         self.G.load_state_dict(torch.load(os.path.join(
-            self.model_save_path, 'epoch_{}_G.pth'.format(self.pretrained_model))))
+            self.model_save_path, '{}_G.pth'.format(self.pretrained_model))))
         print('loaded trained models (epoch: {})..!'.format(self.pretrained_model))
 
     def reset_grad(self):
