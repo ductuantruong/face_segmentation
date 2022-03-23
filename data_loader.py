@@ -80,8 +80,8 @@ class Data_Loader():
         return transform
 
     def loader(self):
-        transform_img = self.transform_img(True, True, True, False) 
-        transform_label = self.transform_label(True, True, False, False)  
+        transform_img = self.transform_img(False, True, True, False) 
+        transform_label = self.transform_label(False, True, False, False)  
         dataset = CelebAMaskHQ(self.img_path, self.label_path, transform_img, transform_label, self.mode)
 
         loader = torch.utils.data.DataLoader(dataset=dataset,

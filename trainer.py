@@ -23,7 +23,7 @@ class Trainer(object):
     def __init__(self, data_loader, eval_loader, config):
 
         # Data loader
-        self.data_loader = data_loader
+        self.train_loader = data_loader
         self.eval_loader = eval_loader
         # exact model and loss
         self.model = config.model
@@ -79,6 +79,7 @@ class Trainer(object):
         min_epoch_loss = float('inf')
         for epoch in range(start, self.total_epoch):
             self.G.train()
+            epoch_train_loss = []
             with tqdm(self.train_loader, unit="batch") as tepoch:
                 for imgs, labels in tepoch:
                     tepoch.set_description(f"Epoch {epoch}")
@@ -87,13 +88,14 @@ class Trainer(object):
                     imgs = imgs.to(device)
                     labels_predict = self.G(imgs)
                     c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
+                    epoch_train_loss.append(c_loss.data.item())
                     tepoch.set_postfix(loss=c_loss.data)
                     self.reset_grad()
                     c_loss.backward()
                     self.g_optimizer.step()
-            
-            self.G.eval()
-            epoch_loss = []
+            avg_train_loss = round(sum(epoch_train_loss)/len(epoch_train_loss), 6)
+            print("Avg Train Loss: {}".format(avg_train_loss))
+            epoch_val_loss = []
             with tqdm(self.eval_loader, unit="batch") as eepoch:
                 for imgs, labels in eepoch:
                     eepoch.set_description(f"Evaluating Epoch {epoch}")
@@ -103,18 +105,22 @@ class Trainer(object):
                     labels_predict = self.G(imgs)
                     c_loss = cross_entropy2d(labels_predict, labels_real_plain.long())
                     eepoch.set_postfix(loss=c_loss.data)
-                    epoch_loss.append(c_loss.data.item())
-            avg_epoch_loss = round(sum(epoch_loss) / len(epoch_loss), 4)
-            writer.add_scalar('Loss/Cross_entrophy_loss', avg_epoch_loss, epoch) 
-            if avg_epoch_loss < min_epoch_loss:
-                min_epoch_loss = avg_epoch_loss
-                print('Saving new best model... Loss: {}'.format(min_epoch_loss))
+                    self.reset_grad()
+                    c_loss.backward()
+                    self.g_optimizer.step()
+                    epoch_val_loss.append(c_loss.data.item())
+            avg_val_loss = round(sum(epoch_val_loss)/len(epoch_val_loss), 6)
+            print("Avg Eval Loss: {}".format(avg_val_loss))
+            writer.add_scalar('Loss/Cross_entrophy_loss', avg_val_loss, epoch) 
+            if epoch % 2 == 0:
+                # min_epoch_loss = avg_epoch_loss
+                # print('Saving new best model... Loss: {}'.format(min_epoch_loss))
                 torch.save(self.G.state_dict(),
                            os.path.join(self.model_save_path, '{}_G.pth'.format(epoch + 1)))
     
     def build_model(self):
 
-        self.G = DeepLabV3().cuda() # unet().cuda()
+        self.G = DeepLabV3().to(device) # unet().to(device)
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 

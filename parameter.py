@@ -16,7 +16,7 @@ def get_parameters():
     parser.add_argument('--total_epoch', type=int, default=50, help='how many epochs')
     parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--num_workers', type=int, default=2)
-    parser.add_argument('--g_lr', type=float, default=0.0002)
+    parser.add_argument('--g_lr', type=float, default=0.0001)
     parser.add_argument('--lr_decay', type=float, default=0.95)
     parser.add_argument('--beta1', type=float, default=0.5)
     parser.add_argument('--beta2', type=float, default=0.999)
