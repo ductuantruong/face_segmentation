@@ -14,7 +14,7 @@ def get_parameters():
 
     # Training setting
     parser.add_argument('--total_epoch', type=int, default=50, help='how many epochs')
-    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--batch_size', type=int, default=10)
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--g_lr', type=float, default=0.0001)
     parser.add_argument('--lr_decay', type=float, default=0.95)
