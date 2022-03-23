@@ -77,6 +77,8 @@ class Trainer(object):
 
         # Start time
         min_epoch_loss = float('inf')
+        training_train_loss = []
+        training_eval_loss = []
         for epoch in range(start, self.total_epoch):
             self.G.train()
             epoch_train_loss = []
@@ -94,6 +96,7 @@ class Trainer(object):
                     c_loss.backward()
                     self.g_optimizer.step()
             avg_train_loss = round(sum(epoch_train_loss)/len(epoch_train_loss), 6)
+            training_train_loss.append(avg_train_loss)
             print("Avg Train Loss: {}".format(avg_train_loss))
             epoch_val_loss = []
             with tqdm(self.eval_loader, unit="batch") as eepoch:
@@ -110,6 +113,7 @@ class Trainer(object):
                     self.g_optimizer.step()
                     epoch_val_loss.append(c_loss.data.item())
             avg_val_loss = round(sum(epoch_val_loss)/len(epoch_val_loss), 6)
+            training_eval_loss.append(avg_val_loss)
             print("Avg Eval Loss: {}".format(avg_val_loss))
             writer.add_scalar('Loss/Cross_entrophy_loss', avg_val_loss, epoch) 
             if epoch % 2 == 0:
@@ -117,7 +121,8 @@ class Trainer(object):
                 # print('Saving new best model... Loss: {}'.format(min_epoch_loss))
                 torch.save(self.G.state_dict(),
                            os.path.join(self.model_save_path, '{}_G.pth'.format(epoch + 1)))
-    
+        print('training_train_loss: ', training_train_loss)
+        print('training_val_loss: ', training_val_loss)
     def build_model(self):
 
         self.G = DeepLabV3().to(device) # unet().to(device)
