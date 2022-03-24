@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def make_folder(path, version):
         if not os.path.exists(os.path.join(path, version)):
@@ -129,6 +130,8 @@ def cross_entropy2d(input, target, weight=None, size_average=True):
         input = F.interpolate(input, size=(ht, wt), mode="bilinear", align_corners=True)
 
     input = input.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c)
+    weight = [0.0407, 0.0413, 0.0544, 0.0554, 0.0554, 0.0554, 0.0553, 0.0553, 0.0552, 0.0553, 0.0553, 0.0553, 0.0551, 0.0377, 0.0551, 0.0554, 0.0555, 0.0532, 0.0537]
+    weight = torch.FloatTensor(weight).to(device)
     target = target.view(-1)
     loss = F.cross_entropy(
         input, target, weight=weight, size_average=size_average, ignore_index=250

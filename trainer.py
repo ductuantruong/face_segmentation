@@ -116,7 +116,7 @@ class Trainer(object):
             training_eval_loss.append(avg_val_loss)
             print("Avg Eval Loss: {}".format(avg_val_loss))
             writer.add_scalar('Loss/Cross_entrophy_loss', avg_val_loss, epoch) 
-            if epoch % 2 == 0:
+            if epoch % 1 == 0:
                 # min_epoch_loss = avg_epoch_loss
                 # print('Saving new best model... Loss: {}'.format(min_epoch_loss))
                 torch.save(self.G.state_dict(),
