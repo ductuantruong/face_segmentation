@@ -11,8 +11,9 @@ from torchvision.utils import save_image
 import numpy as np
 import torch.nn.functional as F
 
-from unet import unet
-from deeplab.deeplabv3 import DeepLabV3
+from fpn.FPN import FPN
+from fpn.resnet import resnet
+
 from utils import *
 from tensorboardX import SummaryWriter
 
@@ -122,10 +123,10 @@ class Trainer(object):
                 torch.save(self.G.state_dict(),
                            os.path.join(self.model_save_path, '{}_G.pth'.format(epoch + 1)))
         print('training_train_loss: ', training_train_loss)
-        print('training_val_loss: ', training_val_loss)
+        print('training_val_loss: ', training_eval_loss)
     def build_model(self):
-
-        self.G = DeepLabV3().to(device) # unet().to(device)
+        blocks = [2,4,23,3]
+        self.G = FPN(blocks, num_classes=19, back_bone='resnet101').to(device)
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
