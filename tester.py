@@ -12,9 +12,9 @@ from torchvision import transforms
 
 import cv2
 import PIL
-from unet import unet
-from deeplab.deeplabv3 import DeepLabV3
 from utils import *
+from fpn.FPN import FPN
+from fpn.resnet import resnet
 from PIL import Image
 
 def transformer(resize, totensor, normalize, centercrop, imsize):
@@ -111,7 +111,8 @@ class Tester(object):
                 save_image(labels_predict_color[k], os.path.join(self.test_color_label_path, str(i * self.batch_size + k) +'.png'))
 
     def build_model(self):
-        self.G = DeepLabV3().cuda() # unet().cuda()
+        blocks = [2,4,23,3]
+        self.G = FPN(blocks, num_classes=19, back_bone='resnet101').to(device)
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
