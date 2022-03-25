@@ -1,4 +1,3 @@
-
 import os
 import time
 import torch
@@ -112,12 +111,8 @@ class Tester(object):
                 save_image(labels_predict_color[k], os.path.join(self.test_color_label_path, str(i * self.batch_size + k) +'.png'))
 
     def build_model(self):
-<<<<<<< HEAD
-        self.G = DeepLabV3().to(device) 
-=======
         blocks = [2,4,23,3]
         self.G = FPN(blocks, num_classes=19, back_bone='resnet101').to(device)
->>>>>>> 579b914ce7836c5cbf0e01c3569e49d7d05da81e
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
