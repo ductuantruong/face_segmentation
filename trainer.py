@@ -98,7 +98,9 @@ class Trainer(object):
                     self.g_optimizer.step()
             avg_train_loss = round(sum(epoch_train_loss)/len(epoch_train_loss), 6)
             training_train_loss.append(avg_train_loss)
-            print("Avg Train Loss: {}".format(avg_train_loss))
+            with open('fpn_log.txt', 'a') as f:
+                f.write("Epoch {}: Avg Train Loss: {}".format(epoch, avg_train_loss))
+                f.write('\n')
             epoch_val_loss = []
             with tqdm(self.eval_loader, unit="batch") as eepoch:
                 for imgs, labels in eepoch:
@@ -115,7 +117,9 @@ class Trainer(object):
                     epoch_val_loss.append(c_loss.data.item())
             avg_val_loss = round(sum(epoch_val_loss)/len(epoch_val_loss), 6)
             training_eval_loss.append(avg_val_loss)
-            print("Avg Eval Loss: {}".format(avg_val_loss))
+            with open('fpn_log.txt', 'a') as f:
+                f.write("Epoch {}: Avg Eval Loss: {}".format(epoch, avg_val_loss))
+                f.write('\n')
             writer.add_scalar('Loss/Cross_entrophy_loss', avg_val_loss, epoch) 
             if epoch % 1 == 0:
                 # min_epoch_loss = avg_epoch_loss
