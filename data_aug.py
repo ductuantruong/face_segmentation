@@ -17,18 +17,6 @@ def save_data_aug(data_dir, label_dir):
         label_img = Image.open(label_dir + image[:-3] + 'png')
         print(label_dir + image)
 
-        """
-        hflip_origin_img = A.HorizontalFlip(p=1)(image=origin_img)['image']
-        hflip_label_img = A.HorizontalFlip(p=1)(image=label_img)['image']
-        cv2.imwrite(data_dir + str(n_total_file) + '.jpg', hflip_origin_img)
-        cv2.imwrite(label_dir + str(n_total_file) + '.png', hflip_label_img)
-
-        vflip_origin_img = A.VerticalFlip(p=1)(image=origin_img)['image']
-        vflip_label_img = A.VerticalFlip(p=1)(image=label_img)['image']
-        cv2.imwrite(data_dir + str(n_total_file + 1) + '.jpg', vflip_origin_img)
-        cv2.imwrite(label_dir + str(n_total_file + 1) + '.png', vflip_label_img)
-        """
-
         bright_origin_img = A.RandomBrightnessContrast(p=1)(image=origin_img)['image']
         cv2.imwrite(data_dir + str(n_total_file) + '.jpg', bright_origin_img)
         label_img.save(label_dir + str(n_total_file) + '.png')        

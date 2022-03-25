@@ -12,11 +12,11 @@ from torchvision import transforms
 
 import cv2
 import PIL
-from unet import unet
 from deeplab.deeplabv3 import DeepLabV3
 from utils import *
 from PIL import Image
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def transformer(resize, totensor, normalize, centercrop, imsize):
     options = []
     if centercrop:
@@ -102,7 +102,7 @@ class Tester(object):
                 img = transform(Image.open(path))
                 imgs.append(img)
             imgs = torch.stack(imgs) 
-            imgs = imgs.cuda()
+            imgs = imgs.to(device)
             labels_predict = self.G(imgs)
             labels_predict_plain = generate_label_plain(labels_predict, self.imsize)
             labels_predict_color = generate_label(labels_predict, self.imsize)
@@ -111,7 +111,7 @@ class Tester(object):
                 save_image(labels_predict_color[k], os.path.join(self.test_color_label_path, str(i * self.batch_size + k) +'.png'))
 
     def build_model(self):
-        self.G = DeepLabV3().cuda() # unet().cuda()
+        self.G = DeepLabV3().to(device) 
         if self.parallel:
             self.G = nn.DataParallel(self.G)
 
